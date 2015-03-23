@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Web GPIO API</title>
+<script>
+(function () {
+  var els = ['section', 'article', 'aside', 'nav', 'header', 'footer', 'time'];
+  for (var i=0; i<els.length; i++ ) {
+    document.createElement(els[i]);
+  }
+})();
+</script>
+<link href="https://www.w3.org/community/src/css/spec/cg-draft.css" rel="stylesheet">
+<style>
+section, article, aside, nav, header, footer {
+	display: block;
+}
+p.subtitle {
+	font-size: 150%;
+}
+/* Note formatting taken from HTML5 spec */
+.note {
+	border-left-style: solid;
+	border-left-width: 0.25em;
+	background: none repeat scroll 0 0 #E9FBE9;
+	border-color: #52E052;
+}
+.note em, .warning em, .note i, .warning i {
+	font-style: normal;
+}
+p.note, div.note {
+	padding: 0.5em 2em;
+}
+span.note {
+	padding: 0 2em;
+}
+.note p:first-child {
+	margin-top: 0;
+}
+.note p:last-child {
+	margin-bottom: 0;
+}
+p.note:before {
+	content: 'Note: ';
+	font-weight: bolder;
+}
+.open-issue {
+	border-left-style: solid;
+	border-left-width: 0.25em;
+	background: none repeat scroll 0 0 #fbfbe9;
+	border-color: #faf9a5;
+}
+.open-issue em, .warning em, .open-issue i, .warning i {
+	font-style: normal;
+}
+p.open-issue, div.open-issue {
+	padding: 0.5em 2em;
+}
+span.open-issue {
+	padding: 0 2em;
+}
+.open-issue p:first-child {
+	margin-top: 0;
+}
+.open-issue p:last-child {
+	margin-bottom: 0;
+}
+p.open-issue:before {
+	content: 'Open issue: ';
+	font-weight: bolder;
+}
+.non-normative {
+	border-left-style: solid;
+	border-left-width: 0.25em;
+	background: none repeat scroll 0 0 #E9FBE9;
+	border-color: #52E052;
+}
+p.non-normative:before {
+	content: 'Non-normative: ';
+	font-weight: bolder;
+}
+p.non-normative, div.non-normative {
+	padding: 0.5em 2em;
+}
+/* Pre.idl formatting taken from HTML5 spec */
+pre.idl {
+	border: solid thin #d3d3d3;
+	background: #FCFCFC;
+	color: black;
+	padding: 0.5em 1em;
+	position: relative;
+}
+pre.idl :link, pre.idl :visited {
+	color: inherit;
+	background: transparent;
+}
+pre.idl::before {
+	content: "IDL";
+	font: bold small sans-serif;
+	padding: 0.5em;
+	background: white;
+	position: absolute;
+	top: 0;
+	margin: -1px 0 0 -4em;
+	width: 1.5em;
+	border: thin solid;
+	border-radius: 0 0 0 0.5em
+}
+/* .example idl formatting taken from HTML5 nightly spec */
+.example {
+	display: block;
+	color: #222222;
+	background: #FCFCFC;
+	border-left-style: solid;
+	border-color: #c0c0c0;
+	border-left-width: 0.25em;
+	margin-left: 1em;
+	padding-left: 1em;
+	padding-bottom: 0.5em;
+}
+.algorithm li {
+	margin-bottom: 0.5em;
+}
+.interface dd, .parameters dt {
+	margin-bottom: 0.5em;
+}
+code {
+	color: orangered;
+}
+dt, dfn {
+	font-weight: bold;
+	font-style: normal;
+}
+</style>
+</head>
+<body>
+<header class="head"> 
+	<!--begin-logo-->
+	<p><a href="http://www.w3.org/"><img alt="W3C" src="https://www.w3.org/Icons/w3c_home" width="72" height="48"></a></p>
+	<!--end-logo-->
+	<h1>Web GPIO API</h1>
+	<p class="subtitle">Draft Report
+		<time datetime="2014-12-20">20 December 2014</time>
+	</p>
+	<dl>
+		<dt>This Version:</dt>
+		<dd><a href="#">http://</a></dd>
+		<dt>Latest Published Version</dt>
+		<dd><a href="#">http://</a></dd>
+		<dt>Previous Version:</dt>
+		<dd>None.</dd>
+		<dt>Editors: </dt>
+		<dd><a href="mailto:futomi.hatano@newphoria.co.jp">Futomi Hatano</a> (<span lang="ja">
+			<ruby>羽田野
+				<rp>(</rp>
+				<rt>はたの</rt>
+				<rp>)</rp>
+			</ruby>
+			<ruby>太巳
+				<rp>(</rp>
+				<rt>ふとみ</rt>
+				<rp>)</rp>
+			</ruby>
+			</span>), Newphoria</dd>
+		<dd><a href="mailto:sa-takagi@kddi.com">Satoru Takagi</a> (<span lang="ja">
+			<ruby>高木
+				<rp>(</rp>
+				<rt>たかぎ</rt>
+				<rp>)</rp>
+			</ruby>
+			<ruby>悟
+				<rp>(</rp>
+				<rt>さとる</rt>
+				<rp>)</rp>
+			</ruby>
+			</span>), KDDI </dd>
+	</dl>
+	<p class="copyright"> <a href="http://www.w3.org/Consortium/Legal/ipr-notice#Copyright">Copyright</a> © 2014 the Contributors to the Web GPIO API Specification,
+		published by the <a href="http://www.w3.org/community/browserobo/">Browsers and Robotics Community Group</a> under the <a href="https://www.w3.org/community/about/agreements/final/">W3C Community
+		Final Specification Agreement (FSA)</a>. A human-readable <a href="http://www.w3.org/community/about/agreements/fsa-deed/">summary</a> is
+		available. </p>
+	<hr>
+</header>
+<section>
+	<h2 class="no-num no-toc" id="abstract">Abstract</h2>
+	<p>This specification defines an API to enable web applications to access GPIO embedded in the underlying device.</p>
+</section>
+<section>
+	<h2 class="no-num no-toc" id="sotd">Status of this document</h2>
+	<p>This specification was published by the <a href="http://www.w3.org/community/browserobo/">Browsers and Robotics Community Group</a>. It is not a W3C Standard nor is it on the W3C Standards Track. Please note that under the <a href="http://www.w3.org/community/about/agreements/cla/">W3C Community Contributor License Agreement (CLA)</a> there is a limited opt-out and other conditions apply. Learn more about <a href="http://www.w3.org/community/">W3C Community and Business Groups</a>.</p>
+</section>
+<nav>
+	<h2 class="no-num no-toc" id="toc">Table of Contents</h2>
+	<ol class="toc">
+		<li><a href="#introduction"><span class="secno">1 </span> Introduction</a></li>
+		<li><a href="#conformance"><span class="secno">2 </span> Conformance</a></li>
+		<li><a href="#terminology"><span class="secno">3 </span> Terminology</a></li>
+		<li><a href="#example"><span class="secno">4 </span> Example</a>
+			<ol class="toc">
+				<li><a href="#example-getting-access"><span class="secno">4.1 </span> Getting Access to the GPIO</a></li>
+				<li><a href="#example-listing-gpio-ports"><span class="secno">4.2 </span> Listing GPIO ports</a></li>
+				<li><a href="#example-getting-a-gpio-port"><span class="secno">4.3 </span> Getting a GPIO port</a></li>
+				<li><a href="#example-activating-a-gpio-port-and-read-the-value"><span class="secno">4.4 </span> Activating a GPIO port and read the value</a></li>
+				<li><a href="#example-listening-to-changes-of-a-gpio-port-value"><span class="secno">4.5 </span> Listening to changes of a GPIO port value</a></li>
+				<li><a href="#example-listening-to-changes-of-multiple-gpio-port-values"><span class="secno">4.6 </span> Listening to changes of multiple GPIO port values</a></li>
+				<li><a href="#example-writing-a-value-to-a-gpio-port"><span class="secno">4.7 </span> Writing a value to the a GPIO port</a></li>
+			</ol>
+		</li>
+		<li><a href="#interfaces"><span class="secno">5 </span> Interfaces</a>
+			<ol class="toc">
+				<li><a href="#navigator-gpio"><span class="secno">5.1 </span> The <code>requestGPIOAccess</code> method</a></li>
+				<li><a href="#GPIOAccess-interface"><span class="secno">5.2 </span> The <code>GPIOAccess</code> interface</a></li>
+				<li><a href="#GPIOPortMap-interface"><span class="secno">5.3 </span> The <code>GPIOPortMap</code> interface</a></li>
+				<li><a href="#GPIOPort-interface"><span class="secno">5.4 </span> The <code>GPIOPort</code> interface</a></li>
+				<li><a href="#GPIOChangeEvent-interface"><span class="secno">5.5 </span> The <code>GPIOChangeEvent</code> interface</a></li>
+				<li><a href="#GPIOChangeEventInit-interface"><span class="secno">5.6 </span> The <code>GPIOChangeEventInit</code> interface</a></li>
+			</ol>
+		</li>
+		<li><a href="#security-considerations"><span class="secno">6 </span> Security considerations</a></li>
+		<li><a class="no-num" href="#references">References</a></li>
+	</ol>
+</nav>
+<section>
+	<h2 id="introduction"><span class="secno">1 </span> Introduction</h2>
+	<p><i>This section is non-normative.</i></p>
+	<p>The Web GPIO API provides interfaces that web applications can access GPIO embedded in the underlying devices. </p>
+	<p>Using this API, web applications can set GPIO direction (input or output), read GPIO value, write GPIO value, watch hardware interrupts, and so on.</p>
+	<p>This API is intended to be used under the mechanism which maintains the safety of the device by which this API operates and users using it. Note that this API is <em>not</em> intended to be used by web applications running on a general web browser without such considerations. As a mechanism for such consideration, there may be packaged applications running on a browser runtime or web applications running on a browser in some kind of dedicated devices. </p>
+</section>
+<section>
+	<h2 id="conformance"><span class="secno">2 </span> Conformance</h2>
+	<p>As well as sections marked as non-normative, all authoring guidelines, diagrams, examples, and notes in this specification are non-normative. Everything else in this specification is normative.</p>
+	<p>The key words &quot;MUST&quot;, &quot;MUST NOT&quot;, &quot;REQUIRED&quot;, &quot;SHALL&quot;, &quot;SHALL NOT&quot;, &quot;SHOULD&quot;, &quot;SHOULD NOT&quot;, &quot;RECOMMENDED&quot;, &quot;MAY&quot;, and &quot;OPTIONAL&quot; in the normative parts of this document are to be interpreted as described in RFC2119. For readability, these words do not appear in all uppercase letters in this document. <a href="#refsRFC2119">[RFC2119]</a></p>
+</section>
+<section>
+	<h2 id="terminology"><span class="secno">3 </span> Terminology</h2>
+	<p>The <dfn id="EventTarget"><code>EventTarget</code></dfn>, <dfn id="Event"><code>Event</code></dfn>, and <dfn id="EventInit"><code>EventInit</code></dfn> interfaces are defined in the Web IDL specification. <a href="#refsDOM4">[DOM4]</a></p>
+	<p>The <dfn id="DOMExceptions"><code>DOMExceptions</code></dfn> interfaces is defined in the Web IDL specification. <a href="#refsWEBIDL">[WEBIDL]</a></p>
+	<p>The <dfn id="Promise"><code>Promise</code></dfn> is defined in ECMA-262 6th Edition. <a href="#refsES6">[ES6]</a></p>
+</section>
+<section>
+	<h2 id="example"><span class="secno">4 </span> Example </h2>
+	<p><i>This section is non-normative.</i></p>
+	<p>The following examples show common GPIO usage in JavaScript. The variable <var>gpio</var> is a <a href="#GPIOAccess"><code>GPIOAccess</code></a> object in the examples blow.</p>
+	<section>
+		<h3 id="example-getting-access"><span class="secno">4.1 </span> Getting Access to the GPIO</h3>
+		<p>This example shows how to request access to the set of GPIOs on the underlying  system.</p>
+		<pre class="example">var gpio = null;  // global GPIOAccess object
+
+navigator.requestGPIOAccess().then(
+    function(gpioAccess) {
+        console.log("GPIO ready!");
+        gpio = gpioAccess; // store in the global
+    },
+    function(error) {
+        console.log("Failed to get GPIO access: " + error.message);
+    }
+);</pre>
+	</section>
+	<section>
+		<h3 id="example-listing-gpio-ports"><span class="secno">4.2 </span> Listing GPIO ports</h3>
+		<p>This example shows how to list the GPIO ports available on the underlying operating system.</p>
+		<pre class="example">
+// get a GPIOPortMap object
+var ports = gpio.ports;
+
+// show the detailed information for each port
+ports.values(function(port) {
+    console.log("* Port " + port.portNumber);
+    console.log("  - Port name   : " + port.portName);
+    console.log("  - PIN name    : " + port.pinName);
+});</pre>
+	</section>
+	<section>
+		<h3 id="example-getting-a-gpio-port"><span class="secno">4.3 </span> Getting a GPIO port</h3>
+		<p>This example shows how to get a GPIO port.</p>
+		<pre class="example">var port = null;  // global GPIOPort object
+
+// get the GPIOPort object representing the GPIO port named "gpio18".
+gpio.ports.get(18).then(
+    function(gpioPort) {
+        port = gpioPort; // store in the global
+    },
+    function(error) {
+        console.log("Failed to get GPIO port: " + error.message);
+    }
+);</pre>
+	</section>
+	<section>
+		<h3 id="example-activating-a-gpio-port-and-read-the-value"><span class="secno">4.4 </span> Activating a GPIO port and read the value</h3>
+		<p>This example shows how to activate the specified GPIO port and read the value.</p>
+		<pre class="example">
+// export (activate) the port.
+port.export("in").then(exportSuccess, gpioError);
+
+// successfully exported
+function exportSuccess() {
+    window.setInterval(function() {
+        port.read().then(readSuccess, gpioError);
+    }, 1000);
+}
+
+// the value successfully read
+function readSuccess(value) {
+    console.log(port.portName + ": " + value);
+}
+
+// Show an error
+function gpioError(error) {
+    console.log("Error: " + error.message + "(" + port.portName + ")");
+}</pre>
+	</section>
+	<section>
+		<h3 id="example-listening-to-changes-of-a-gpio-port-value"><span class="secno">4.5 </span> Listening to changes of a GPIO port value</h3>
+		<p>This example shows how to listen to changes of a GPIO port values. In this example, the exported GPIO port will be unexported in 60 seconds.</p>
+		<pre class="example">
+// export (activate) the port
+port.export("in").then(exportSuccess, gpioError);
+
+// successfully exported
+function exportSuccess() {
+    // set an event handler
+    port.onchange = valueChanged;
+}
+
+// the value changed
+function valueChanged(event) {
+    var port = event.port; // GPIOPort object
+    var value = event.value; // current value
+    console.log(port.portName + ": " + value);
+}
+
+// Show an error
+function gpioError(error) {
+    console.log("Error: " + error.message + "(" + port.portName + ")");
+}
+
+// unexport (deactivate) the port in 60 seconds
+window.setTimeout(function() {
+    if(port.exported === true) {
+        port.unexport();
+    }
+}, 60000);
+</pre>
+	</section>
+	<section>
+		<h3 id="example-listening-to-changes-of-multiple-gpio-port-values"><span class="secno">4.6 </span> Listening to changes of multiple GPIO port values</h3>
+		<p>This example shows how to listen to changes of multiple GPIO port values as a whole. In this example, 3 GPIO ports are listened. When the value of the GPIO port &quot;gpio25&quot; changes to 1,  all of the exported GPIO port will be unexported.</p>
+		<pre class="example">// set a listener for all of the exported GPIO ports
+gpio.onchange = valueChanged;
+
+// get some GPIOPort objects
+var targets = [
+    port18,
+    port23,
+    port25
+];
+
+// export (activate) the ports
+targets.forEach(function(port) {
+    port.export("in").then(exportSuccess, gpioError);
+});
+
+// successfully exported
+function exportSuccess() {
+    console.log(port.portName + " is exported.");
+}
+
+// the value changed
+function valueChanged(event) {
+    var port = event.port; // GPIOPort object
+    var value = event.value; // current value
+    console.log(port.portName + ": " + value);
+    // if the value of the gpio25 was changed to 1, unexport all of the exported GPIO ports
+    if(port.portNumber === 25 &amp;&amp; value === 1) {
+        gpio.unexportAll(unexportSuccess, gpioError);
+    }
+}
+
+// successfully unexported
+function unexportSuccess() {
+    console.log("This process has been terminated.");
+}
+
+// Show an error
+function gpioError(error) {
+    console.log("Error: " + error.message + "(" + port.portName + ")");
+}</pre>
+	</section>
+	<section>
+		<h3 id="example-writing-a-value-to-a-gpio-port"><span class="secno">4.7 </span> Writing a value to a GPIO port</h3>
+		<p>This example shows how to write a value to the specified GPIO port. This example writes  0 or 1 one after the other to the GPIO port "gpio18" at a second interval.</p>
+		<pre class="example">
+// export (activate) the port.
+port.export("out").then(writeValue, gpioError);
+
+// the value to be written
+var v = 0;
+
+// successfully exported and write a value
+function writeValue() {
+    v = v ? 0 : 1;
+    port.write(v).then(writeSuccess, gpioError);
+}
+
+// the value successfully written
+function writeSuccess(value) {
+    console.log(port.portName + " was set to " + value);
+    window.setTimeout(writeValue, 1000);
+}
+
+// Show an error
+function gpioError(error) {
+    console.log("Error: " + error.message + "(" + port.portName + ")");
+}</pre>
+	</section>
+</section>
+<section>
+	<h2 id="interfaces"><span class="secno">5 </span> Interfaces </h2>
+	<section>
+		<h3 id="navigator-gpio"><span class="secno">5.1 </span> The <code>requestGPIOAccess()</code> method</h3>
+		<pre class="idl">partial interface Navigator {
+    <a href="#Promise">Promise</a>&lt;<a href="#GPIOAccess">GPIOAccess</a>&gt; <a href="#requestGPIOAccess">requestGPIOAccess</a> ();
+};</pre>
+		<p>The <dfn id="requestGPIOAccess"><code>requestGPIOAccess()</code></dfn> method must be visible on the <a href="http://www.w3.org/TR/html5/webappapis.html#navigator"><code>Navigator</code></a> object if the script's global object is the <a href="http://www.w3.org/TR/html5/browsers.html#window"><code>Window</code></a> object, or on the <a href="http://www.w3.org/TR/workers/#workernavigator"><code>WorkerNavigator</code></a> object if the script's global object is the <a href="http://www.w3.org/TR/workers/#workerutils"><code>WorkerUtils</code></a>. <a href="#refsHTML5">[HTML5]</a> <a href="#refsWEBWORKERS">[WEBWORKERS]</a></p>
+		<p>The <a href="#requestGPIOAccess"><code>requestGPIOAccess()</code></a> method is used to get a <a href="#GPIOAccess"><code>GPIOAccess</code></a> object. The <a href="#requestGPIOAccess"><code>requestGPIOAccess()</code></a> method is invoked, the user agent must run the steps as follows:</p>
+		<ol>
+			<li>
+				<p>Let <var>promise</var> be a new <a href="#Promise"><code>Promise</code></a> object and <var>resolver</var> be its associated resolver.</p>
+			</li>
+			<li>
+				<p>Return <var>promise</var> and run the following steps asynchronously.</p>
+			</li>
+			<li>
+				<p>If the underlying operating system does not support GPIO access, then jump to the step labeled <i>failure</i> below.</p>
+			</li>
+			<li>
+				<p>Create a <a href="#GPIOPortMap"><code>GPIOPortMap</code></a> object, then let <var>map</var> be the newly created <a href="#GPIOPortMap"><code>GPIOPortMap</code></a>.</p>
+			</li>
+			<li>
+				<p>Find all of the  GPIO ports available on the underlying operating system. For each of the GPIO port, create a <a href="#GPIOPort"><code>GPIOPort</code></a> object for the GPIO port, then add it to the <var>map</var>.</p>
+				<p class="open-issue">How can the UA find the GPIO ports available on the underlying operating system?</p>
+			</li>
+			<li>
+				<p>Create a <a href="#GPIOAccess"><code>GPIOAccess</code></a> object, then set the <a href="#ports"><code>ports</code></a> attribute to the <var>map</var>.</p>
+			</li>
+			<li>
+				<p>Let <var>access</var> to be the newly created <a href="#MIDIAccess"><code>GPIOAccess</code></a> at the previous step.</p>
+			</li>
+			<li>
+				<p><strong>success</strong>: Call <var>resolver</var>'s <code>accept(<var>value</var>)</code> method with <var>access</var> as <var>value</var> argument. Abort these steps.</p>
+			</li>
+			<li>
+				<p><strong>failure</strong>: Let <var>error</var> be a new <a href="#DOMExceptions"><code>DOMExceptions</code></a>. This must be of type "<code>NotSupportedError</code>". Then call <var>resolver</var>'s <code>reject(<var>value</var>)</code> method with <var>error</var> as <var>value</var> argument.</p>
+			</li>
+		</ol>
+	</section>
+	<section>
+		<h3 id="GPIOAccess-interface"><span class="secno">5.2 </span> The <code>GPIOAccess</code> interface</h3>
+		<pre class="idl">interface <dfn id="GPIOAccess">GPIOAccess</dfn> : <a href="#EventTarget">EventTarget</a> {
+    readonly attribute <a href="#GPIOPortMap">GPIOPortMap</a>    <a href="#ports">ports</a>;
+    <a href="#Promise">Promise</a>  <a href="#unexportAll">unexportAll</a>();
+
+             attribute EventHandler   <a href="#onchange-gpioaccess">onchange</a>;
+};</pre>
+		<p>The <dfn id="ports"><code>ports</code></dfn> attribute must return the <a href="#GPIOPortMap"><code>GPIOPortMap</code></a> object representing all of the GPIO ports available on the underlying operating system.</p>
+		<p>The <dfn id="unexportAll"><code>unexportAll()</code></dfn> method is used to release all of the  GPIO ports exported by this API.  The <a href="#unexportAll"><code>unexportAll()</code></a> method is invoked, the user agent must run the steps as follows:</p>
+		<ol>
+			<li>
+				<p>Let <var>promise</var> be a new <a href="#Promise"><code>Promise</code></a> object and <var>resolver</var> be its associated resolver.</p>
+			</li>
+			<li>
+				<p>Return <var>promise</var> and run the following steps asynchronously.</p>
+			</li>
+			<li>
+				<p>Let <var>list</var> be the list of the <a href="#GPIOPort"><code>GPIOPort</code></a> object whose <a href="#exported"><code>exported</code></a> attribute is true.</p>
+			</li>
+			<li>
+				<p>For each of the <a href="#GPIOPort"><code>GPIOPort</code></a> object in the <var>list</var>, release (unexport) the related GPIO port, then set the <a href="#exported"><code>exported</code></a> attribute to false.</p>
+			</li>
+			<li>
+				<p>Wait until the previous step for all of the <a href="#GPIOPort"><code>GPIOPort</code></a> in the <var>list</var> finishes.</p>
+			</li>
+			<li>
+				<p>If all of the exported GPIO port are released successfully,  jump to the step labeled <i>success</i> below. Otherwise, jump to the step labeled <i>failure</i> below.</p>
+			</li>
+			<li>
+				<p><strong>success</strong>: Call <var>resolver</var>'s <code>accept()</code> method without any argument. Abort these steps.</p>
+			</li>
+			<li>
+				<p><strong>failure</strong>: Let <var>error</var> be a new <a href="#DOMExceptions"><code>DOMExceptions</code></a>. This must be of type "<code>OperationError</code>". Then call <var>resolver</var>'s <code>reject(<var>value</var>)</code> method with <var>error</var> as <var>value</var> argument.</p>
+			</li>
+		</ol>
+		<p>The <dfn id="onchange-gpioaccess"><code>onchange</code></dfn> attribute is a event handler invoked when the value of one of the exported GPIO ports changes (i.e. the value changes from 1 to 0 or from 0 to 1). Whenever the event handler is to be invoked, the user agent must run the following steps:</p>
+		<ol>
+			<li>
+				<p>Let <var>port</var> be the <a href="#GPIOPort"><code>GPIOPort</code></a> object.</p>
+			</li>
+			<li>
+				<p>Let <var>port value</var> be the value of the GPIO port corresponding to the <a href="#GPIOPort"><code>GPIOPort</code></a>.</p>
+			</li>
+			<li>
+				<p>Let <var>event</var> be a newly constructed <a href="#GPIOChangeEvent"><code>GPIOChangeEvent</code></a>, with the <a href="#value"><code>value</code></a> attribute set to the <var>port value</var>, and the <a href="#port"><code>port</code></a> attribute set to the <var>port</var>.</p>
+			</li>
+			<li>
+				<p>Fire an event named <code>change</code> at the <a href="#GPIOAccess-interface"><code>GPIOAccess</code></a> object<a href="#GPIOPort"><code></code></a>, using the <var>event</var> as the event object.</p>
+			</li>
+		</ol>
+		<p class="note">Before the <code>change</code> event is fired on the <a href="#GPIOAccess-interface"><code>GPIOAccess</code></a> object, another <code>change</code> event is fired on the <a href="#GPIOPort"><code>GPIOPort</code></a> object. Therefore, the event handler set on the <a href="#GPIOAccess-interface"><code>GPIOAccess</code></a> is invoked after the event handler set on the <a href="#GPIOPort"><code>GPIOPort</code></a> object is invoked.</p>
+	</section>
+	<section>
+		<h3 id="GPIOPortMap-interface"><span class="secno">5.3 </span> The <code>GPIOPortMap</code> interface</h3>
+		<pre class="idl">interface <dfn id="GPIOPortMap">GPIOPortMap</dfn> {
+             attribute readonly unsigned short <a href="#size">size</a>;
+    function <a href="#keys">keys</a> (void function (<var>portNumber</var>));
+    function <a href="#values">values</a> (void function (<var>GPIOPort</var>));
+    <a href="#GPIOPort">GPIOPort</a> <a href="#get">get</a> (unsigned short <var>key</var>);
+};</pre>
+		<p>The <dfn id="size"><code>size</code></dfn> attributes is the number of  GPIO ports available on the underlying operating system at the current time.</p>
+		<p>The <dfn id="keys"><code>keys()</code></dfn> method is an iterator for keys. The <dfn id="values"><code>values()</code></dfn> method is an iterator for values.</p>
+		<p>The <dfn id="get"><code>get()</code></dfn> method is a getter for a <a href="#GPIOPort"><code>GPIOPort</code></a>. When the <a href="#get"><code>get()</code></a> method is invoked, the GPIO port number must be passed as the first argument. If the first argument is not specified, or it is not valid as a port number, or it does not represent any GPIO port available on the underlying operating system, the <a href="#get"><code>get()</code></a> method must return null. Otherwise, the <a href="#get"><code>get()</code></a> method must return the <a href="#GPIOPort"><code>GPIOPort</code></a> corresponding to the specified port number.</p>
+		<p>This interface is used to represent all the currently available GPIO ports as a MapClass-like interface. This interface also act as an associative array:</p>
+		<pre class="example">// Iterate for values
+ports.keys( function( portNumber ) {
+    var port = ports.get(portNumber);
+    console.log(port.pinName + ", " + port.portNumber);
+});
+
+// or you could express as:
+ports.values( function( port ) {
+    console.log(port.pinName + ", " + port.portNumber);
+});
+
+// or you could express as:
+for (port in ports) {
+    console.log(port.pinName + ", " + port.portNumber);
+}</pre>
+	</section>
+	<section>
+		<h3 id="GPIOPort-interface"><span class="secno">5.4 </span> The <code>GPIOPort</code> interface</h3>
+		<pre class="idl">
+interface <dfn id="GPIOPort">GPIOPort</dfn> : <a href="#EventTarget">EventTarget</a> {
+
+    readonly attribute unsigned short <a href="#portNumber">portNumber</a>;
+    readonly attribute DOMString      <a href="#portName">portName</a>;
+    readonly attribute DOMString      <a href="#pinName">pinName</a>;
+
+    readonly attribute <a href="#DirectionMode">DirectionMode</a>  <a href="#direction">direction</a>;
+    readonly attribute boolean        <a href="#exported">exported</a>;
+
+    <a href="#Promise">Promise</a>  <a href="#export">export</a>(<a href="#DirectionMode">DirectionMode</a> <var>direction</var>);
+    <a href="#Promise">Promise</a>  <a href="#unexport">unexport</a>();
+
+    <a href="#Promise">Promise</a>  <a href="#read">read</a>();
+    <a href="#Promise">Promise</a>  <a href="#write">write</a>(unsigned short <var>value</var>);
+
+             attribute EventHandler   <a href="#onchange-gpioport">onchange</a>;
+};
+
+enum <dfn id="DirectionMode">DerectionMode</dfn> { &quot;&quot;, "in", "out" }</pre>
+		<p>The <a href="#GPIOPort"><code>GPIOPort</code></a> interface represents a GPIO port  assigned to a physical GPIO pin.</p>
+		<p>The <dfn id="portNumber"><code>portNumber</code></dfn> attribute must return the GPIO port number assigned to the <a href="#GPIOPort"><code>GPIOPort</code></a> object.</p>
+		<p>The <dfn id="portName"><code>portName</code></dfn> attribute must return the name of the GPIO port. If the name is unknown, the <a href="#portName"><code>portName</code></a> attribute must return an empty string.</p>
+		<p>The <dfn id="pinName"><code>pinName</code></dfn> attribute must return the name of the GPIO pin. If the name is unknown, the <a href="#pinName"><code>pinName</code></a> attribute must return an empty string.</p>
+		<div class="note">
+			<p>The value to <a href="#portNumber"><code>portNumber</code></a> attribute is a port number assigned to a physical  pin by the underlying operating system. This value is based on the name of the GPIO port. Note that this value is <em>not</em> based on the name of the physical  pin.</p>
+			<p>In most of operating systems, the name of the  physical  pin  is different from the    name of the GPIO port. For example, the pin name &quot;P1-12&quot; on the Raspberry Pi is mapped to &quot;gpio18&quot; on  Raspbian Linux. In this case, the value of the <a href="#portNumber"><code>portNumber</code></a> attribute is 18, the value of the <a href="#portName"><code>portName</code></a> is a string &quot;gpio18&quot;, and the value of the <a href="#pinName"><code>pinName</code></a> attribute is a string &quot;P1-12&quot;.</p>
+		</div>
+		<p>The <dfn id="direction"><code>direction</code></dfn> attribute must return  either	an empty string, &quot;<code>in</code>&quot;, or &quot;<code>out</code>&quot;.	This value is initially an empty string. This value is set to &quot;<code>in</code>&quot;, or &quot;<code>out</code>&quot; when the <a href="#export"><code>export()</code></a> method is invoked and successfully completed based on the argument passed to the method.</p>
+		<p>The <dfn id="exported"><code>exported</code></dfn> attribute	gives	whether the GPIO port has been exported or not. If the GPIO port has been exported, the <a href="#exported"><code>exported</code></a> attribute must return true, otherwise false.</p>
+		<p>The <dfn id="export"><code>export()</code></dfn> method 		
+			activate the related GPIO port. When the <a href="#export"><code>export()</code></a> method is invoked, the user agent must run the steps as follows:</p>
+		<ol>
+			<li>
+				<p>Let <var>promise</var> be a new <a href="#Promise"><code>Promise</code></a> object and <var>resolver</var> be its associated resolver.</p>
+			</li>
+			<li>
+				<p>Return <var>promise</var> and run the following steps asynchronously.</p>
+			</li>
+			<li>
+				<p>If the value of the <a href="#exported"><code>exported</code></a> attribute is true, jump to the step labeled <i>success</i> below.</p>
+			</li>
+			<li>
+				<p>Let <var>direction</var> be the value of the first argument passed to the method.</p>
+			</li>
+			<li>
+				<p>If <var>direction</var> is neither &quot;<code>in</code>&quot; nor &quot;<code>out</code>&quot;, jump to the step labeled <i>failure</i> below.</p>
+			</li>
+			<li>
+				<p>Activate the related GPIO port in the specified direction mode ("<code>in</code>" or "<code>out</code>"). If succeeded, set the <a href="#exported"><code>exported</code></a> attribute to true, then jump to the step labeled <i>success</i> below. Otherwise, jump to the step labeled <i>failure</i> below.</p>
+			</li>
+			<li>
+				<p><strong>success</strong>: Call <var>resolver</var>'s <code>accept()</code> method without any argument. Abort these steps.</p>
+			</li>
+			<li>
+				<p><strong>failure</strong>: Let <var>error</var> be a new <a href="#DOMExceptions"><code>DOMExceptions</code></a>. This must be of type "<code>InvalidAccessError</code>" if <var>direction</var> was invalid (i.e. neither "<code>in</code>" nor "<code>out</code>"), "<code>SecurityError</code>" if this operation was denied by the operating system because of some kind of security reason, "<code>OperationError</code>" if this operation was failed because of any  reasons other than security reason. Then call <var>resolver</var>'s <code>reject(<var>value</var>)</code> method with <var>error</var> as <var>value</var> argument.</p>
+			</li>
+		</ol>
+		<p>The <dfn id="unexport"><code>unexport()</code></dfn> method deactivates	the related GPIO port. When the <a href="#unexport"><code>unexport()</code></a> method is invoked, the user agent must run the steps as follows:</p>
+		<ol>
+			<li>
+				<p>Let <var>promise</var> be a new <a href="#Promise"><code>Promise</code></a> object and <var>resolver</var> be its associated resolver.</p>
+			</li>
+			<li>
+				<p>Return <var>promise</var> and run the following steps asynchronously.</p>
+			</li>
+			<li>
+				<p>If the value of the <a href="#exported"><code>exported</code></a> attribute is <em>not</em> true, jump to the step labeled <i>success</i> below.</p>
+			</li>
+			<li>
+				<p>Deactivate the related GPIO port. If succeeded, set the <a href="#exported"><code>exported</code></a> attribute to false, then jump to the step labeled <i>success</i> below. Otherwise, jump to the step labeled <i>failure</i> below.</p>
+			</li>
+			<li>
+				<p><strong>success</strong>: Call <var>resolver</var>'s <code>accept()</code> method without any argument. Abort these steps.</p>
+			</li>
+			<li>
+				<p><strong>failure</strong>: Let <var>error</var> be a new <a href="#DOMExceptions"><code>DOMExceptions</code></a>. This must be of type "<code>OperationError</code>". Then call <var>resolver</var>'s <code>reject(<var>value</var>)</code> method with <var>error</var> as <var>value</var> argument.</p>
+			</li>
+		</ol>
+		<p>The <dfn id="read"><code>read()</code></dfn> method reads the value from the related GPIO port. When the <a href="#read"><code>read()</code></a> method is invoked, the user agent must run the steps as follows:</p>
+		<ol>
+			<li>
+				<p>Let <var>promise</var> be a new <a href="#Promise"><code>Promise</code></a> object and <var>resolver</var> be its associated resolver.</p>
+			</li>
+			<li>
+				<p>Return <var>promise</var> and run the following steps asynchronously.</p>
+			</li>
+			<li>
+				<p>If the value of the <a href="#exported"><code>exported</code></a> attribute is <em>not</em> true, jump to the step labeled <i>failure</i> below.</p>
+			</li>
+			<li>
+				<p>If the value of the <a href="#direction"><code>direction</code></a> attribute is <em>not</em> "<code>in</code>", jump to the step labeled <i>failure</i> below.</p>
+			</li>
+			<li>
+				<p>Read the value of the related GPIO port. If succeeded, let <var>port value</var> be the value of the related GPIO port. Otherwise, jump to the step labeled <i>failure</i> below.</p>
+			</li>
+			<li>
+				<p><strong>success</strong>: Call <var>resolver</var>'s <code>accept(<var>value</var>)</code> method with <var>port value</var> as <var>value</var> argument. Abort these steps.</p>
+			</li>
+			<li>
+				<p><strong>failure</strong>: Let <var>error</var> be a new <a href="#DOMExceptions"><code>DOMExceptions</code></a>. This must be of type "<code>InvalidAccessError</code>" if the value of the <a href="#exported"><code>exported</code></a> attribute is not true or the value of the <a href="#direction"><code>direction</code></a> attribute is not "<code>in</code>", "<code>OperationError</code>" otherwise . Then call <var>resolver</var>'s <code>reject(<var>value</var>)</code> method with <var>error</var> as <var>value</var> argument.</p>
+			</li>
+		</ol>
+		<p>The <dfn id="write"><code>write()</code></dfn> method writes the  value passed as the first argument to the related GPIO port. The value must be numeric 0 or 1. When the <a href="#write"><code>write()</code></a> method is invoked, the user agent must run the steps as follows:</p>
+		<ol>
+			<li>
+				<p>Let <var>promise</var> be a new <a href="#Promise"><code>Promise</code></a> object and <var>resolver</var> be its associated resolver.</p>
+			</li>
+			<li>
+				<p>Return <var>promise</var> and run the following steps asynchronously.</p>
+			</li>
+			<li>
+				<p>If the value of the <a href="#exported"><code>exported</code></a> attribute is <em>not</em> true, jump to the step labeled <i>failure</i> below.</p>
+			</li>
+			<li>
+				<p>If the value of the <a href="#direction"><code>direction</code></a> attribute is <em>not</em> "<code>out</code>", jump to the step labeled <i>failure</i> below.</p>
+			</li>
+			<li>
+				<p>Let <var>port value</var> be the value of the first argument passed to this method.</p>
+			</li>
+			<li>
+				<p>If <var>port value</var> is neither numeric 0 nor 1,  jump to the step labeled <i>failure</i> below.</p>
+			</li>
+			<li>
+				<p>write <var>port value</var> to the related GPIO port. If succeeded, jump to the step labeled <i>success</i> below. Otherwise, jump to the step labeled <i>failure</i> below.</p>
+			</li>
+			<li>
+				<p><strong>success</strong>: Call <var>resolver</var>'s <code>accept(<var>value</var>)</code> method with <var>port value</var> as <var>value</var> argument. Abort these steps.</p>
+			</li>
+			<li>
+				<p><strong>failure</strong>: Let <var>error</var> be a new <a href="#DOMExceptions"><code>DOMExceptions</code></a>. This must be of type "<code>InvalidAccessError</code>" if the value of the <a href="#exported"><code>exported</code></a> attribute is not true or if the value of the <a href="#direction"><code>direction</code></a> attribute is not "<code>out</code>" or if <var>port value</var> is neither 0 nor 1, "<code>OperationError</code>" otherwise  . Then call <var>resolver</var>'s <code>reject(<var>value</var>)</code> method with <var>error</var> as <var>value</var> argument.</p>
+			</li>
+		</ol>
+		<p>The <dfn id="onchange-gpioport"><code>onchange</code></dfn> attribute is a event handler invoked when the value of the  GPIO port corresponding to the <a href="#GPIOPort"><code>GPIOPort</code></a> object changes (i.e. the value changes from 1 to 0 or from 0 to 1). Whenever the event handler is to be invoked, the user agent must run the following steps:</p>
+		<ol>
+			<li>
+				<p>Let <var>port</var> be the <a href="#GPIOPort"><code>GPIOPort</code></a> object.</p>
+			</li>
+			<li>
+				<p>Let <var>port value</var> be the value of the GPIO port corresponding to the <a href="#GPIOPort"><code>GPIOPort</code></a>.</p>
+			</li>
+			<li>
+				<p>Let <var>event</var> be a newly constructed <a href="#GPIOChangeEvent"><code>GPIOChangeEvent</code></a>, with the <a href="#value"><code>value</code></a> attribute set to <var>port value</var>, and the <a href="#port"><code>port</code></a> attribute set to <var>port</var>.</p>
+			</li>
+			<li>
+				<p>Fire an event named <code>change</code> at the <a href="#GPIOPort"><code>GPIOPort</code></a> object, using the <var>event</var> as the event object.</p>
+			</li>
+		</ol>
+		<p class="note">After the <code>change</code> event is fired on the <a href="#GPIOPort"><code>GPIOPort</code></a> <a href="#GPIO-interface"></a> object, another <code>change</code> event will be fired on the <a href="#GPIOAccess-interface"><code>GPIOAccess</code></a> object. Therefore, the event handler set on the <a href="#GPIO-interface"></a> <a href="#GPIOPort"><code>GPIOPort</code></a> is invoked before the event handler set on the <a href="#GPIOAccess-interface"><code>GPIOAccess</code></a> object is invoked.</p>
+	</section>
+	<section>
+		<h3 id="GPIOChangeEvent-interface"><span class="secno">5.5 </span> The <code>GPIOChangeEvent</code> interface</h3>
+		<p>When a value of a GPIO port changes, if the <a href="#onchange-gpioport"><code>onchange</code></a> of the <a href="#GPIOPort"><code>GPIOPort</code></a> object is set to a function, the <a href="#GPIOChangeEvent"><code>GPIOChangeEvent</code></a> object is passed to the  event handler function as the first argument . If the <a href="#onchange-gpioaccess"><code>onchange</code></a> attribute of </p>
+		<pre class="idl">[Constructor(DOMString <var>type</var>, optional <a href="#GPIOChangeEventInit">GPIOChangeEventInit</a> <var>eventInitDict</var>)]
+interface <dfn id="GPIOChangeEvent">GPIOChangeEvent</dfn> : <a href="#Event">Event</a> {
+    readonly    attribute unsign short <a href="#value">value</a>;
+    readonly    attribute <a href="#GPIOPort">GPIOPort</a>     <a href="#port">port</a>;
+};</pre>
+		<p>The <dfn id="value"><code>value</code></dfn> attribute must return the value of the  GPIO port corresponding to the <a href="#GPIOPort"><code>GPIOPort</code></a> object where the <code>change</code> event was fired..</p>
+		<p>The <dfn id="port"><code>port</code></dfn> attribute must return the <a href="#GPIOPort"><code>GPIOPort</code></a> object where the <code>change</code> event was fired.</p>
+	</section>
+	<section>
+		<h3 id="GPIOChangeEventInit-interface"><span class="secno">5.6 </span> The <code>GPIOChangeEventInit</code> interface</h3>
+		<pre class="idl">dictionary <dfn id="MIDIMessageEventInit">MIDIMessageEventInit</dfn> : EventInit {
+    unsign short value;
+    <a href="#GPIOPort">GPIOPort</a>     port;
+};</pre>
+		<p>The <code>value</code> attribute is a value of the related GPIO port.</p>
+	</section>
+</section>
+<section>
+	<h2 id="security-considerations"><span class="secno">6 </span> Security considerations</h2>
+	<p><i>TBD</i></p>
+</section>
+<section>
+	<h2 class="no-num" id="references">References</h2>
+	<dl>
+		<dt id="refsDOM4">[DOM4]</dt>
+		<dd><cite><a href="http://www.w3.org/TR/dom/">DOM4</a></cite>, 
+			Anne van Kesteren, Aryeh Gregor, Ms2ger, Alex Russell, Robin Berjon. W3C.</dd>
+		<dt id="refsES6">[ES6]</dt>
+		<dd><cite><a href="http://people.mozilla.org/~jorendorff/es6-draft.html">ECMA-262 6th Edition</a></cite>. Ecma International.</dd>
+		<dt id="refsHTML5">[HTML5]</dt>
+		<dd><cite><a href="http://www.w3.org/TR/html5/">HTML5</a></cite>, Robin Berjon, Travis Leithead, Erika Doyle Navara, Edward O'Connor, Silvia Pfeiffer, Ian Hickson. W3C.</dd>
+		<dt id="refsRFC2119">[RFC2119]</dt>
+		<dd><cite><a href="http://tools.ietf.org/html/rfc2119">Key words for use in RFCs to Indicate Requirement Levels</a></cite>, S. Bradner. IETF.</dd>
+		<dt id="refsWEBIDL">[WEBIDL]</dt>
+		<dd><cite><!-- <a href="http://www.w3.org/TR/WebIDL/"> --><a href="http://heycam.github.io/webidl/">Web IDL</a></cite>, Cameron McCormack. W3C.</dd>
+		<dt id="refsWEBWORKERS">[WEBWORKERS]</dt>
+		<dd><cite><a href="http://www.w3.org/TR/workers/">Web Workers</a></cite>, Ian Hickson. W3C.</dd>
+	</dl>
+</section>
+</body>
+</html>
