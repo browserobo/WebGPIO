@@ -1,4 +1,4 @@
 # WebGPIO
 WebGPIO spec draft
 
-https://rawgit.com/browserobo/WebGPIO/blob/master/index.html
+https://rawgit.com/browserobo/WebGPIO/master/index.html
