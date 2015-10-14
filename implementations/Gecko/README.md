@@ -1,1 +1,1 @@
-This is implementation of WebI2C for Gecko in this directory.
+This is implementation of WebGPIO for Gecko in this directory.
