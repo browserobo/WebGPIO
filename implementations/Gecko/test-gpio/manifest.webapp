@@ -1,0 +1,13 @@
+{
+  "name": "Test GPIO",
+  "description": "Test GPIO",
+  "type": "certified",
+  "launch_path": "/index.html",
+  "developer": {
+    "name": "masap",
+    "url": "https://github.com/masap"
+  },
+  "icons": {
+    "128": "/style/icons/sensor.png"
+  }
+}

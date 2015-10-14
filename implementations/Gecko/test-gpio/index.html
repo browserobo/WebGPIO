@@ -1,0 +1,22 @@
+<!doctype html>
+
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1">
+        <title>Test GPIO</title>
+        <script src="./js/WebGPIO.js"></script>
+    </head>
+    
+    <body>
+        <h3>GPIO</h3>
+        <select id="portno_select"></select>
+        <select id="direction_select">
+          <option value="out" selected="selected">out</option>
+          <option value="in">in</option>
+        </select>
+        <button id="gpioOnButton">write(1)</button>
+        <button id="gpioOffButton">write(0)</button>
+        <button id="gpioReadButton">read</button><span id="message"></span>
+    </body>
+</html>
