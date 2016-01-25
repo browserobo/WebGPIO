@@ -492,6 +492,8 @@ function gpioError(error) {
 				<p><strong>failure</strong>: Let <var>error</var> be a new <a href="#DOMExceptions"><code>DOMExceptions</code></a>. This must be of type "<code>OperationError</code>". Then call <var>resolver</var>'s <code>reject(<var>value</var>)</code> method with <var>error</var> as <var>value</var> argument.</p>
 			</li>
 		</ol>
+		<p class="open-issue">Is unexportAll necessary?</p>
+		<p class="open-issue">Should GPIOAccess have an EventTarget interface? </p>
 		<p>The <dfn id="onchange-gpioaccess"><code>onchange</code></dfn> attribute is a event handler invoked when the value of one of the exported GPIO ports changes (i.e. the value changes from 1 to 0 or from 0 to 1). Whenever the event handler is to be invoked, the user agent must run the following steps:</p>
 		<ol>
 			<li>
@@ -507,6 +509,7 @@ function gpioError(error) {
 				<p>Fire an event named <code>change</code> at the <a href="#GPIOAccess-interface"><code>GPIOAccess</code></a> object<a href="#GPIOPort"><code></code></a>, using the <var>event</var> as the event object.</p>
 			</li>
 		</ol>
+		<p class="open-issue">Is onChange needed although there is an EventTarget interface?</p>
 		<p class="note">Before the <code>change</code> event is fired on the <a href="#GPIOAccess-interface"><code>GPIOAccess</code></a> object, another <code>change</code> event is fired on the <a href="#GPIOPort"><code>GPIOPort</code></a> object. Therefore, the event handler set on the <a href="#GPIOAccess-interface"><code>GPIOAccess</code></a> is invoked after the event handler set on the <a href="#GPIOPort"><code>GPIOPort</code></a> object is invoked.</p>
 	</section>
 	<section>
@@ -536,6 +539,7 @@ ports.values( function( port ) {
 for (port in ports) {
     console.log(port.pinName + ", " + port.portNumber);
 }</pre>
+<p class="open-issue">This should be Iterable</p>
 	</section>
 	<section>
 		<h3 id="GPIOPort-interface"><span class="secno">5.4 </span> The <code>GPIOPort</code> interface</h3>
@@ -558,7 +562,7 @@ interface <dfn id="GPIOPort">GPIOPort</dfn> : <a href="#EventTarget">EventTarget
              attribute EventHandler   <a href="#onchange-gpioport">onchange</a>;
 };
 
-enum <dfn id="DirectionMode">DerectionMode</dfn> { &quot;&quot;, "in", "out" }</pre>
+enum <dfn id="DirectionMode">DirectionMode</dfn> { "in", "out" }</pre>
 		<p>The <a href="#GPIOPort"><code>GPIOPort</code></a> interface represents a GPIO port  assigned to a physical GPIO pin.</p>
 		<p>The <dfn id="portNumber"><code>portNumber</code></dfn> attribute must return the GPIO port number assigned to the <a href="#GPIOPort"><code>GPIOPort</code></a> object.</p>
 		<p>The <dfn id="portName"><code>portName</code></dfn> attribute must return the name of the GPIO port. If the name is unknown, the <a href="#portName"><code>portName</code></a> attribute must return an empty string.</p>
@@ -567,6 +571,7 @@ enum <dfn id="DirectionMode">DerectionMode</dfn> { &quot;&quot;, "in", "out" }</
 			<p>The value to <a href="#portNumber"><code>portNumber</code></a> attribute is a port number assigned to a physical  pin by the underlying operating system. This value is based on the name of the GPIO port. Note that this value is <em>not</em> based on the name of the physical  pin.</p>
 			<p>In most of operating systems, the name of the  physical  pin  is different from the    name of the GPIO port. For example, the pin name &quot;P1-12&quot; on the Raspberry Pi is mapped to &quot;gpio18&quot; on  Raspbian Linux. In this case, the value of the <a href="#portNumber"><code>portNumber</code></a> attribute is 18, the value of the <a href="#portName"><code>portName</code></a> is a string &quot;gpio18&quot;, and the value of the <a href="#pinName"><code>pinName</code></a> attribute is a string &quot;P1-12&quot;.</p>
 		</div>
+		<p class="open-issue">Are portName and pinName needed? May portMap have such a functionality? </p>
 		<p>The <dfn id="direction"><code>direction</code></dfn> attribute must return  either	an empty string, &quot;<code>in</code>&quot;, or &quot;<code>out</code>&quot;.	This value is initially an empty string. This value is set to &quot;<code>in</code>&quot;, or &quot;<code>out</code>&quot; when the <a href="#export"><code>export()</code></a> method is invoked and successfully completed based on the argument passed to the method.</p>
 		<p>The <dfn id="exported"><code>exported</code></dfn> attribute	gives	whether the GPIO port has been exported or not. If the GPIO port has been exported, the <a href="#exported"><code>exported</code></a> attribute must return true, otherwise false.</p>
 		<p>The <dfn id="export"><code>export()</code></dfn> method 		
@@ -618,6 +623,7 @@ enum <dfn id="DirectionMode">DerectionMode</dfn> { &quot;&quot;, "in", "out" }</
 				<p><strong>failure</strong>: Let <var>error</var> be a new <a href="#DOMExceptions"><code>DOMExceptions</code></a>. This must be of type "<code>OperationError</code>". Then call <var>resolver</var>'s <code>reject(<var>value</var>)</code> method with <var>error</var> as <var>value</var> argument.</p>
 			</li>
 		</ol>
+		<p class="open-issue">Is unexport necessary?</p>
 		<p>The <dfn id="read"><code>read()</code></dfn> method reads the value from the related GPIO port. When the <a href="#read"><code>read()</code></a> method is invoked, the user agent must run the steps as follows:</p>
 		<ol>
 			<li>
