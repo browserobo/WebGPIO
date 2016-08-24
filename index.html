@@ -562,7 +562,7 @@ interface <dfn id="GPIOPort">GPIOPort</dfn> : <a href="#EventTarget">EventTarget
              attribute EventHandler   <a href="#onchange-gpioport">onchange</a>;
 };
 
-enum <dfn id="DirectionMode">DirectionMode</dfn> { "in", "out" }</pre>
+enum <dfn id="DirectionMode">DirectionMode</dfn> { &quot;&quot;, "in", "out" }</pre>
 		<p>The <a href="#GPIOPort"><code>GPIOPort</code></a> interface represents a GPIO port  assigned to a physical GPIO pin.</p>
 		<p>The <dfn id="portNumber"><code>portNumber</code></dfn> attribute must return the GPIO port number assigned to the <a href="#GPIOPort"><code>GPIOPort</code></a> object.</p>
 		<p>The <dfn id="portName"><code>portName</code></dfn> attribute must return the name of the GPIO port. If the name is unknown, the <a href="#portName"><code>portName</code></a> attribute must return an empty string.</p>
